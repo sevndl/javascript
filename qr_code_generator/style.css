@@ -1,0 +1,20 @@
+body {
+  text-align: center;
+}
+
+.inputData {
+  width: 25%;
+  text-align: center;
+  margin: 10px 10px;
+}
+
+.inputBtn {
+  text-align: center;
+  margin: 10px 10px;
+}
+
+.qr {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
