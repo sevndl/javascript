@@ -4,6 +4,8 @@ async function partie() {
   document.getElementById("resultat").innerHTML = "";
   const canvas = document.getElementById("snake");
   const context = canvas.getContext("2d");
+  let vitesse = 500; // en milllisecondes
+  let partieEnCours = true;
   
   // unité de mesure du plateau
   const unite = 30;
@@ -25,8 +27,6 @@ async function partie() {
   
   // direction du serpent
   let d = "RIGHT";
-  
-  document.addEventListener("keydown", direction);
   function direction(event) {
     let key = event.key;
     if (key == "ArrowLeft"  && d != "RIGHT") {
@@ -40,10 +40,20 @@ async function partie() {
     }
   } 
   
-  // génération aléatoire de la nourriture sur le plateau 
+  // génération aléatoire de la nourriture sur le plateau
+  let randomFoodX = unite + Math.floor(Math.random()*17) * unite;
+  let randomFoodY = 2 * unite + Math.floor(Math.random()*15) * unite;
+
+  for (let i = 0; i < snake.length; i++) {
+    if (randomFoodX == snake[i].x && randomFoodY == snake[i].y) {
+      randomFoodX = unite + Math.floor(Math.random()*17) * unite;
+      randomFoodY = 2 * unite + Math.floor(Math.random()*15) * unite;
+    }
+  } 
+
   let food = {
-    x: unite + Math.floor(Math.random()*17) * unite,
-    y: 2 * unite + Math.floor(Math.random()*15) * unite
+    x: randomFoodX,
+    y: randomFoodY
   };
   
   // création du score
@@ -58,11 +68,12 @@ async function partie() {
     }
     return false;
   }
-  
+
   //////////////////////////////////////////////////////////////////////
 
-  let partieEnCours = true;
   while (partieEnCours) {
+    await new Promise(intervalle => setTimeout(intervalle, vitesse));
+    document.addEventListener("keydown", direction);
     // affichage sur le canvas
     // affichage du fond
     let alternance = true;
@@ -119,6 +130,9 @@ async function partie() {
         x: unite + Math.floor(Math.random()*17) * unite,
         y: 2 * unite + Math.floor(Math.random()*15) * unite
       };
+      if (vitesse > 100) {
+        vitesse -= 20;
+      }
     } else {
       snake.pop();
     }
@@ -130,7 +144,7 @@ async function partie() {
     
     if (nouvelleTete.x < 30 || nouvelleTete.x > 510 || nouvelleTete.y < 60 || nouvelleTete.y > 510 || seMangeLaQueue({x: snakeHeadX, y: snakeHeadY}, snake)) {
       partieEnCours = false;
-      document.getElementById("resultat").innerHTML = "PARTIE TERMINEE, VOUS AVEZ PERDU";
+      document.getElementById("resultat").innerHTML = "PARTIE TERMINEE, VOUS AVEZ PERDU AVEC LE SCORE DE " + score;
     }
 
     snake.unshift(nouvelleTete);
@@ -138,7 +152,5 @@ async function partie() {
     context.fillStyle = "white";
     context.clearRect(55, 20, 50, 30);
     context.fillText(score, 60, 40);
-
-    await new Promise(r => setTimeout(r, 100));
   }
 }
