@@ -101,14 +101,15 @@ async function partie() {
     let snakeHeadX = snake[0].x;
     let snakeHeadY = snake[0].y;
   
-    if (d == "LEFT") 
+    if (d == "LEFT") {
       snakeHeadX -= unite;
-    if (d == "RIGHT") 
+    } else if (d == "RIGHT") {
       snakeHeadX += unite;
-    if (d == "UP")
+    } else if (d == "UP") {
       snakeHeadY -= unite;
-    if (d == "DOWN")
+    } else if (d == "DOWN") {
       snakeHeadY += unite;
+    }
   
     // si le serpent mange, on laisse toutes les cellules du tableau
     // sinon on enlève la dernière pour qu'il garde sa taille actuelle au prochain tour de boucle
@@ -127,7 +128,7 @@ async function partie() {
       y: snakeHeadY
     };
     
-    if (nouvelleTete.x < 30 || nouvelleTete.x > 540 || nouvelleTete.y < 30 || nouvelleTete.y > 540 || seMangeLaQueue({x: snakeHeadX, y: snakeHeadY}, snake)) {
+    if (nouvelleTete.x < 30 || nouvelleTete.x > 510 || nouvelleTete.y < 60 || nouvelleTete.y > 510 || seMangeLaQueue({x: snakeHeadX, y: snakeHeadY}, snake)) {
       partieEnCours = false;
       document.getElementById("resultat").innerHTML = "PARTIE TERMINEE, VOUS AVEZ PERDU";
     }
