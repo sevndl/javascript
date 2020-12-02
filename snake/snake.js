@@ -72,6 +72,7 @@ async function partie() {
   //////////////////////////////////////////////////////////////////////
 
   while (partieEnCours) {
+    document.getElementById("jouer").disabled = true;
     await new Promise(intervalle => setTimeout(intervalle, vitesse));
     document.addEventListener("keydown", direction);
     // affichage sur le canvas
@@ -145,6 +146,7 @@ async function partie() {
     if (nouvelleTete.x < 30 || nouvelleTete.x > 510 || nouvelleTete.y < 60 || nouvelleTete.y > 510 || seMangeLaQueue({x: snakeHeadX, y: snakeHeadY}, snake)) {
       partieEnCours = false;
       document.getElementById("resultat").innerHTML = "PARTIE TERMINEE, VOUS AVEZ PERDU AVEC LE SCORE DE " + score;
+      document.getElementById("jouer").disabled = false;
     }
 
     snake.unshift(nouvelleTete);
