@@ -6,10 +6,14 @@ async function partie() {
   const context = canvas.getContext("2d");
   let vitesse = 500; // en milllisecondes
   let partieEnCours = true;
-  
+  const left = "LEFT";
+  const right = "RIGHT";
+  const up = "UP";
+  const down = "DOWN";
+
   // unité de mesure du plateau
   const unite = 30;
-  
+
   // chargement des images
   const foodImage = new Image();
   const caseVertClair = new Image();
@@ -17,53 +21,47 @@ async function partie() {
   foodImage.src = "images/food.png";
   caseVertClair.src = "images/case_vert_clair.png";
   caseVertFonce.src = "images/case_vert_fonce.png";
-  
+
   // création du snake
   let snake = [];
   snake[0] = {
     x: 9 * unite,
     y: 10 * unite
   };
-  
+
   // direction du serpent
-  let directions = [];
-  let d = "RIGHT";
-  function direction(event) {
+  let directionEnCours = right;
+  let directionSouhaitee = null;
+  function souhaitDirection(event) {
     let key = event.key;
-    if (key == "ArrowLeft"  && d != "RIGHT") {
-      d = "LEFT";
-      directions.push(d);
-    } else if (key == "ArrowUp" && d != "DOWN") {
-      d = "UP";
-      directions.push(d);
-    } else if (key == "ArrowRight" && d != "LEFT")  {
-      d = "RIGHT";
-      directions.push(d);
-    } else if (key == "ArrowDown" && d != "UP") {
-      d = "DOWN";
-      directions.push(d);
+    if (key == "ArrowLeft") {
+      directionSouhaitee = left;
+    } else if (key == "ArrowUp") {
+      directionSouhaitee = up;
+    } else if (key == "ArrowRight") {
+      directionSouhaitee = right;
+    } else if (key == "ArrowDown") {
+      directionSouhaitee = down;
     }
-  } 
-  
+  }
+
   // génération aléatoire de la nourriture sur le plateau
   let randomFoodX = unite + Math.floor(Math.random()*17) * unite;
   let randomFoodY = 2 * unite + Math.floor(Math.random()*15) * unite;
-
   for (let i = 0; i < snake.length; i++) {
     if (randomFoodX == snake[i].x && randomFoodY == snake[i].y) {
       randomFoodX = unite + Math.floor(Math.random()*17) * unite;
       randomFoodY = 2 * unite + Math.floor(Math.random()*15) * unite;
     }
   } 
-
   let food = {
     x: randomFoodX,
     y: randomFoodY
   };
-  
+
   // création du score
   let score = 0;
-  
+
   // vérifie si le serpent se mange la queue
   function seMangeLaQueue(tete, snake) {
     for (let i = 0; i < snake.length; i++) {
@@ -74,17 +72,8 @@ async function partie() {
     return false;
   }
 
-  //////////////////////////////////////////////////////////////////////
-
-  let cptDirection = 0;
-  while (partieEnCours) {
-    document.getElementById("jouer").disabled = true;
-    document.addEventListener("keydown", direction, false);
-
-    await new Promise(intervalle => setTimeout(intervalle, vitesse));
-
-    // affichage sur le canvas
-    // affichage du fond
+  // affichage du plateau
+  function affichePlateau() {
     let alternance = true;
     for (let i = 30; i <= 510; i += unite) {
       alternance = !alternance;
@@ -98,14 +87,10 @@ async function partie() {
         }
       }
     }
-  
-    // affichage de la nourriture pour le score
-    context.drawImage(foodImage, 15, 15, unite, unite);
-  
-    // affichage de la nourriture aléatoirement sur le plateau
-    context.drawImage(foodImage, food.x, food.y, unite, unite);
-  
-    // affichage du serpent
+  }
+
+  // affichage du serpent
+  function affichageSerpent() {
     for (let i = 0; i < snake.length; i++) {
       // remplissage du corps
       if (i == 0) {
@@ -115,27 +100,50 @@ async function partie() {
       }
       context.fillRect(snake[i].x + 10, snake[i].y + 10, 10, 10);
     }
-  
-    // taille du serpent augmente en fonction de la direction
-    // s'il arrive sur la case avec la nourriture, on laisse l'ancienne tête, sinon on l'enlève
+  }
+
+  // affichage de la nourriture pour le score
+  function affichageImageScore() {
+    context.drawImage(foodImage, 15, 15, unite, unite);
+  }
+
+  // affichage de la nourriture aléatoirement sur le plateau
+  function affichageNourritureAleatoire() {
+    context.drawImage(foodImage, food.x, food.y, unite, unite);
+  }
+
+  //////////////////////////////////////////////////////////////////////
+  document.addEventListener("keydown", souhaitDirection, false);
+  while (partieEnCours) {
+    document.getElementById("jouer").disabled = true;
+
+    await new Promise(intervalle => setTimeout(intervalle, vitesse));
+
+    affichePlateau();
+    affichageSerpent();
+    affichageImageScore();
+    affichageNourritureAleatoire();
+
     let snakeHeadX = snake[0].x;
     let snakeHeadY = snake[0].y;
 
-    if (directions[cptDirection] == "LEFT") {
-      console.log(directions[cptDirection]);
+    // mettre directions dans des constantes
+    if ((directionSouhaitee == left && directionEnCours != right) || (directionSouhaitee == up && directionEnCours != down) || (directionSouhaitee == right && directionEnCours != left) || (directionSouhaitee == down && directionEnCours != up)) {
+      directionEnCours = directionSouhaitee;
+      directionSouhaitee = null;
+    }
+
+    // mettre dans des fonctions séparées
+    if (directionEnCours == left) {
       snakeHeadX -= unite;
-    } else if (directions[cptDirection] == "RIGHT") {
-      console.log(directions[cptDirection]);
+    } else if (directionEnCours == right) {
       snakeHeadX += unite;
-    } else if (directions[cptDirection] == "UP") {
-      console.log(directions[cptDirection]);
+    } else if (directionEnCours == up) {
       snakeHeadY -= unite;
-    } else if (directions[cptDirection] == "DOWN") {
-      console.log(directions[cptDirection]);
+    } else if (directionEnCours == down) {
       snakeHeadY += unite;
     }
-    cptDirection += 1;
-  
+
     // si le serpent mange, on laisse toutes les cellules du tableau
     // sinon on enlève la dernière pour qu'il garde sa taille actuelle au prochain tour de boucle
     if (snakeHeadX == food.x && snakeHeadY == food.y) {
@@ -155,7 +163,7 @@ async function partie() {
       x: snakeHeadX,
       y: snakeHeadY
     };
-    
+
     if (nouvelleTete.x < 30 || nouvelleTete.x > 510 || nouvelleTete.y < 60 || nouvelleTete.y > 510 || seMangeLaQueue({x: snakeHeadX, y: snakeHeadY}, snake)) {
       partieEnCours = false;
       document.getElementById("resultat").innerHTML = "PARTIE TERMINEE, VOUS AVEZ PERDU AVEC LE SCORE DE " + score;
