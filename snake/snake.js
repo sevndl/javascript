@@ -89,6 +89,14 @@ async function partie() {
     }
   }
 
+  // vérification de la direcion
+  function verificationDirection() {
+    if ((directionSouhaitee == left && directionEnCours != right) || (directionSouhaitee == up && directionEnCours != down) || (directionSouhaitee == right && directionEnCours != left) || (directionSouhaitee == down && directionEnCours != up)) {
+      directionEnCours = directionSouhaitee;
+      directionSouhaitee = null;
+    }
+  }
+
   // affichage du serpent
   function affichageSerpent() {
     for (let i = 0; i < snake.length; i++) {
@@ -112,6 +120,13 @@ async function partie() {
     context.drawImage(foodImage, food.x, food.y, unite, unite);
   }
 
+  //affichage du score
+  function affichageScore() {
+    context.font = "24px serif";
+    context.fillStyle = "white";
+    context.clearRect(55, 20, 50, 30);
+    context.fillText(score, 60, 40);
+  }
   //////////////////////////////////////////////////////////////////////
   document.addEventListener("keydown", souhaitDirection, false);
   while (partieEnCours) {
@@ -127,11 +142,7 @@ async function partie() {
     let snakeHeadX = snake[0].x;
     let snakeHeadY = snake[0].y;
 
-    // mettre directions dans des constantes
-    if ((directionSouhaitee == left && directionEnCours != right) || (directionSouhaitee == up && directionEnCours != down) || (directionSouhaitee == right && directionEnCours != left) || (directionSouhaitee == down && directionEnCours != up)) {
-      directionEnCours = directionSouhaitee;
-      directionSouhaitee = null;
-    }
+    verificationDirection();
 
     // mettre dans des fonctions séparées
     if (directionEnCours == left) {
@@ -171,9 +182,6 @@ async function partie() {
     }
 
     snake.unshift(nouvelleTete);
-    context.font = "24px serif";
-    context.fillStyle = "white";
-    context.clearRect(55, 20, 50, 30);
-    context.fillText(score, 60, 40);
+    affichageScore();
   }
 }
