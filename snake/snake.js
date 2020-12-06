@@ -26,17 +26,22 @@ async function partie() {
   };
   
   // direction du serpent
+  let directions = [];
   let d = "RIGHT";
   function direction(event) {
     let key = event.key;
     if (key == "ArrowLeft"  && d != "RIGHT") {
       d = "LEFT";
+      directions.push(d);
     } else if (key == "ArrowUp" && d != "DOWN") {
       d = "UP";
+      directions.push(d);
     } else if (key == "ArrowRight" && d != "LEFT")  {
       d = "RIGHT";
+      directions.push(d);
     } else if (key == "ArrowDown" && d != "UP") {
       d = "DOWN";
+      directions.push(d);
     }
   } 
   
@@ -71,10 +76,13 @@ async function partie() {
 
   //////////////////////////////////////////////////////////////////////
 
+  let cptDirection = 0;
   while (partieEnCours) {
     document.getElementById("jouer").disabled = true;
+    document.addEventListener("keydown", direction, false);
+
     await new Promise(intervalle => setTimeout(intervalle, vitesse));
-    document.addEventListener("keydown", direction);
+
     // affichage sur le canvas
     // affichage du fond
     let alternance = true;
@@ -112,16 +120,21 @@ async function partie() {
     // s'il arrive sur la case avec la nourriture, on laisse l'ancienne tête, sinon on l'enlève
     let snakeHeadX = snake[0].x;
     let snakeHeadY = snake[0].y;
-  
-    if (d == "LEFT") {
+
+    if (directions[cptDirection] == "LEFT") {
+      console.log(directions[cptDirection]);
       snakeHeadX -= unite;
-    } else if (d == "RIGHT") {
+    } else if (directions[cptDirection] == "RIGHT") {
+      console.log(directions[cptDirection]);
       snakeHeadX += unite;
-    } else if (d == "UP") {
+    } else if (directions[cptDirection] == "UP") {
+      console.log(directions[cptDirection]);
       snakeHeadY -= unite;
-    } else if (d == "DOWN") {
+    } else if (directions[cptDirection] == "DOWN") {
+      console.log(directions[cptDirection]);
       snakeHeadY += unite;
     }
+    cptDirection += 1;
   
     // si le serpent mange, on laisse toutes les cellules du tableau
     // sinon on enlève la dernière pour qu'il garde sa taille actuelle au prochain tour de boucle
