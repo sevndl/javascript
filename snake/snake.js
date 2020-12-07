@@ -52,15 +52,20 @@ async function partie() {
     }
   }
 
-  // génération aléatoire de la nourriture sur le plateau
-  let nourritureAleatoireX = unite + Math.floor(Math.random()*17) * unite;
-  let nourritureAleatoireY = 2 * unite + Math.floor(Math.random()*15) * unite;
+  // génération aléatoire de la nourriture
+  let nourritureAleatoireX;
+  let nourritureAleatoireY;
+  function generationAleatoireNourriture() {
+    nourritureAleatoireX = unite + Math.floor(Math.random()*17) * unite;
+    nourritureAleatoireY = 2 * unite + Math.floor(Math.random()*15) * unite;
+  }
+
   for (let i = 0; i < snake.length; i++) {
     if (nourritureAleatoireX == snake[i].x && nourritureAleatoireY == snake[i].y) {
-      nourritureAleatoireX = unite + Math.floor(Math.random()*17) * unite;
-      nourritureAleatoireY = 2 * unite + Math.floor(Math.random()*15) * unite;
+      generationAleatoireNourriture();
     }
-  } 
+  }
+  generationAleatoireNourriture();
   let food = {
     x: nourritureAleatoireX,
     y: nourritureAleatoireY
