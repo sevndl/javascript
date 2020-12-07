@@ -29,6 +29,13 @@ async function partie() {
     y: 10 * unite
   };
 
+  let snakeTeteX = snake[0].x;
+  let snakeTeteY = snake[0].y;
+  let nouvelleTete = {
+    x: snakeTeteX,
+    y: snakeTeteY
+  };
+
   // direction du serpent
   let directionEnCours = right;
   let directionSouhaitee = null;
@@ -46,17 +53,17 @@ async function partie() {
   }
 
   // génération aléatoire de la nourriture sur le plateau
-  let randomFoodX = unite + Math.floor(Math.random()*17) * unite;
-  let randomFoodY = 2 * unite + Math.floor(Math.random()*15) * unite;
+  let nourritureAleatoireX = unite + Math.floor(Math.random()*17) * unite;
+  let nourritureAleatoireY = 2 * unite + Math.floor(Math.random()*15) * unite;
   for (let i = 0; i < snake.length; i++) {
-    if (randomFoodX == snake[i].x && randomFoodY == snake[i].y) {
-      randomFoodX = unite + Math.floor(Math.random()*17) * unite;
-      randomFoodY = 2 * unite + Math.floor(Math.random()*15) * unite;
+    if (nourritureAleatoireX == snake[i].x && nourritureAleatoireY == snake[i].y) {
+      nourritureAleatoireX = unite + Math.floor(Math.random()*17) * unite;
+      nourritureAleatoireY = 2 * unite + Math.floor(Math.random()*15) * unite;
     }
   } 
   let food = {
-    x: randomFoodX,
-    y: randomFoodY
+    x: nourritureAleatoireX,
+    y: nourritureAleatoireY
   };
 
   // création du score
@@ -127,37 +134,39 @@ async function partie() {
     context.clearRect(55, 20, 50, 30);
     context.fillText(score, 60, 40);
   }
-  //////////////////////////////////////////////////////////////////////
-  document.addEventListener("keydown", souhaitDirection, false);
-  while (partieEnCours) {
-    document.getElementById("jouer").disabled = true;
 
-    await new Promise(intervalle => setTimeout(intervalle, vitesse));
+  // déplacement à gauche
+  function deplacementGauche() {
+    snakeTeteX -= unite;
+  }
 
-    affichePlateau();
-    affichageSerpent();
-    affichageImageScore();
-    affichageNourritureAleatoire();
+  // déplacement à gauche
+  function deplacementDroite() {
+    snakeTeteX += unite;
+  }
 
-    let snakeHeadX = snake[0].x;
-    let snakeHeadY = snake[0].y;
+  // déplacement à gauche
+  function deplacementHaut() {
+    snakeTeteY -= unite;
+  }
 
-    verificationDirection();
+  // déplacement à gauche
+  function deplacementBas() {
+    snakeTeteY += unite;
+  }
 
-    // mettre dans des fonctions séparées
-    if (directionEnCours == left) {
-      snakeHeadX -= unite;
-    } else if (directionEnCours == right) {
-      snakeHeadX += unite;
-    } else if (directionEnCours == up) {
-      snakeHeadY -= unite;
-    } else if (directionEnCours == down) {
-      snakeHeadY += unite;
+  // vérification fin de partie
+  function verificationPartieTerminee() {
+    if (nouvelleTete.x < 30 || nouvelleTete.x > 510 || nouvelleTete.y < 60 || nouvelleTete.y > 510 || seMangeLaQueue({x: snakeTeteX, y: snakeTeteY}, snake)) {
+      partieEnCours = false;
+      document.getElementById("resultat").innerHTML = "PARTIE TERMINEE, VOUS AVEZ PERDU AVEC LE SCORE DE " + score;
+      document.getElementById("jouer").disabled = false;
     }
+  }
 
-    // si le serpent mange, on laisse toutes les cellules du tableau
-    // sinon on enlève la dernière pour qu'il garde sa taille actuelle au prochain tour de boucle
-    if (snakeHeadX == food.x && snakeHeadY == food.y) {
+  // état du serpent --> grandit ou reste identique
+  function etatSerpent() {
+    if (snakeTeteX == food.x && snakeTeteY == food.y) {
       score += 1;
       food = {
         x: unite + Math.floor(Math.random()*17) * unite,
@@ -169,18 +178,41 @@ async function partie() {
     } else {
       snake.pop();
     }
+  }
 
-    let nouvelleTete = {
-      x: snakeHeadX,
-      y: snakeHeadY
-    };
+  //////////////////////////////////////////////////////////////////////
+  document.addEventListener("keydown", souhaitDirection, false);
+  while (partieEnCours) {
+    document.getElementById("jouer").disabled = true;
+    await new Promise(intervalle => setTimeout(intervalle, vitesse));
 
-    if (nouvelleTete.x < 30 || nouvelleTete.x > 510 || nouvelleTete.y < 60 || nouvelleTete.y > 510 || seMangeLaQueue({x: snakeHeadX, y: snakeHeadY}, snake)) {
-      partieEnCours = false;
-      document.getElementById("resultat").innerHTML = "PARTIE TERMINEE, VOUS AVEZ PERDU AVEC LE SCORE DE " + score;
-      document.getElementById("jouer").disabled = false;
+    affichePlateau();
+    affichageSerpent();
+    affichageImageScore();
+    affichageNourritureAleatoire();
+
+    snakeTeteX = snake[0].x;
+    snakeTeteY = snake[0].y;
+    verificationDirection();
+
+    if (directionEnCours == left) {
+      deplacementGauche();
+    } else if (directionEnCours == right) {
+      deplacementDroite();
+    } else if (directionEnCours == up) {
+      deplacementHaut();
+    } else if (directionEnCours == down) {
+      deplacementBas();
     }
 
+    etatSerpent();
+
+    nouvelleTete = {
+      x: snakeTeteX,
+      y: snakeTeteY
+    };
+
+    verificationPartieTerminee();
     snake.unshift(nouvelleTete);
     affichageScore();
   }
