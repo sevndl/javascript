@@ -55,21 +55,25 @@ async function partie() {
   // génération aléatoire de la nourriture
   let nourritureAleatoireX;
   let nourritureAleatoireY;
+  let food;
+  
   function generationAleatoireNourriture() {
     nourritureAleatoireX = unite + Math.floor(Math.random()*17) * unite;
     nourritureAleatoireY = 2 * unite + Math.floor(Math.random()*15) * unite;
+    verificationGenerationAleatoireNourriture();
+    food = {
+      x: nourritureAleatoireX,
+      y: nourritureAleatoireY
+    };
   }
 
-  for (let i = 0; i < snake.length; i++) {
-    if (nourritureAleatoireX == snake[i].x && nourritureAleatoireY == snake[i].y) {
-      generationAleatoireNourriture();
+  function verificationGenerationAleatoireNourriture() {
+    for (let i = 1; i < snake.length; i++) {
+      if (nourritureAleatoireX == snake[i].x && nourritureAleatoireY == snake[i].y) {
+        generationAleatoireNourriture();
+      }
     }
   }
-  generationAleatoireNourriture();
-  let food = {
-    x: nourritureAleatoireX,
-    y: nourritureAleatoireY
-  };
 
   // création du score
   let score = 0;
@@ -173,10 +177,7 @@ async function partie() {
   function etatSerpent() {
     if (snakeTeteX == food.x && snakeTeteY == food.y) {
       score += 1;
-      food = {
-        x: unite + Math.floor(Math.random()*17) * unite,
-        y: 2 * unite + Math.floor(Math.random()*15) * unite
-      };
+      generationAleatoireNourriture();
       if (vitesse > 100) {
         vitesse -= 20;
       }
@@ -187,6 +188,7 @@ async function partie() {
 
   //////////////////////////////////////////////////////////////////////
   document.addEventListener("keydown", souhaitDirection, false);
+  generationAleatoireNourriture();
   while (partieEnCours) {
     document.getElementById("jouer").disabled = true;
     await new Promise(intervalle => setTimeout(intervalle, vitesse));
