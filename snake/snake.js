@@ -170,6 +170,9 @@ async function partie() {
       partieEnCours = false;
       document.getElementById("resultat").innerHTML = "PARTIE TERMINEE, VOUS AVEZ PERDU AVEC LE SCORE DE " + score;
       document.getElementById("jouer").disabled = false;
+    } else if (snake.length == 254) {
+      partieEnCours = false;
+      document.getElementById("resultat").innerHTML = "PARTIE TERMINEE, VOUS AVEZ GAGNE";
     }
   }
 
